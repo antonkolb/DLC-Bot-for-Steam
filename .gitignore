@@ -1,6 +1,9 @@
 # libs
 /lib
 
+# Other files from compilation
+*.tds
+
 # Prerequisites
 *.d
 
