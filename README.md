@@ -1,3 +1,6 @@
 # DLC Bot for Steam
 A bot that looks up, if there are new (=unpurchased) DLC available for owned games.
-Written (so far) mostly in C, using some C++ Stlibs and cURL library.
+Written in C.
+
+Used libraries (see "LICENCES"):
+Curl and libcurl 7.50.3
