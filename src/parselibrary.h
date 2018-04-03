@@ -44,12 +44,11 @@ int parse_licences( const char* in, const char* out ){
     }
     out_file = fopen( out, "w" );
     if( !out_file ){
-        perror( "Failed to open licences file to write" );
+        perror( "Failed to open library file to write" );
         return errno;
    }
 
-    while( !feof(in_file) ){
-        fgets( tmp, line_size, in_file );
+    while( fgets( tmp, line_size, in_file ) ){
 
         //if line with apps is encountered
         if( !strncmp(key, tmp, strlen(key)) ){
@@ -71,7 +70,7 @@ int parse_licences( const char* in, const char* out ){
     }
     close_result = fclose(out_file);
     if( close_result ){
-        perror("Failed to close licences file after writing");
+        perror("Failed to close library file after writing");
         return errno;
     }
 

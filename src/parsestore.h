@@ -46,8 +46,8 @@ int parse_store( const char* in, const char* out ){
     char* tmp = (char*) calloc( tmp_size, sizeof(char));
     char* id = (char*) calloc( 10, sizeof(char));
 
-    while( !feof(in_file) ){
-        tmp = fgets( tmp, tmp_size, in_file );
+    while( fgets( tmp, tmp_size, in_file ) ){
+
         //get lines, that have an appid
         if( !strncmp(key, tmp, strlen(key)) ){
                 id = strncpy( id, tmp+strlen(key), strlen(tmp)-strlen(key)-2); //cut away the key in the beginning and the comma/ new line at the end
