@@ -33,17 +33,6 @@ int main(void){
     /* create database */
     create_hash( game_library );
 
-    char* game = "607730\n";
-
-    struct app_id* it;
-    //for( it=my_library; it!=NULL; it=it->hh.next ) printf( "Item: |%s|\n", it->id_as_str );
-    //printf( "There are %u items", HASH_COUNT( my_library ) );
-
-    if( library_contains_app( game ) ) printf( "I do own %s!\n", game );
-    else printf("I do NOT own %s!\n", game);
-
-
-
 }
 
 /*=============================================================================
@@ -51,7 +40,7 @@ int main(void){
 =============================================================================*/
 int library_contains_app( const char* appid_str ){
 
-    struct app_id* app;
+    struct app_id* app = NULL;
     HASH_FIND_STR( my_library, appid_str, app );
 
     if( app == NULL ) return 0;
@@ -75,31 +64,32 @@ int create_hash( const char* licence_file ){
     char* line = calloc( line_size, sizeof(char) );
 
     while( fgets( line, line_size, in_file ) ){
-        line = calloc( line_size, sizeof(char) ); //for each item once
         if( line[ strlen(line)-1 ] == '\n' ) line[ strlen(line)-1 ]= '\0'; //removing new line sign, if necessary (last line has no new line)
-        //printf("%s|", line);
         add2hash( &line );
+        line = calloc( line_size, sizeof(char) ); //for each item once
 
     }
 
     /* cleanup and return */
-    //free( line ); //don't free. The items in the has are needed!
+    //free( line ); //don't free. The items in the hash are needed!
     return 0;
 }
 
-/*====================================================================
+/*=====================================================
 === wraps the steps to add a struct into the uthash ===
-====================================================================*/
+=====================================================*/
 int add2hash( char*const* appid ){
 
-
-    struct app_id* id;
-    //HASH_FIND_STR( my_library, &line, id ); check if element with id exists; super unlikely, since Steam wants to be them unique out of personal reasons
+    struct app_id* id = NULL;
+    HASH_FIND_STR( my_library, *appid, id ); //check if element with id exists; There are as of now 110 apps, that I purchased twice (via bundles f.ex.)
+    if( id ){
+        //fprintf(stderr, "There is already an element with the this id! %s\n", *appid);
+        return 1;
+    }
     id = (struct app_id*) malloc( sizeof(struct app_id) );
+
     id->id_as_str = *appid;
     HASH_ADD_KEYPTR( hh, my_library, id->id_as_str, strlen(id->id_as_str), id ); //macro magic
-
-
 
     return 0;
 
