@@ -4,6 +4,7 @@
 
 #include "parsestore.h"
 #include "parselibrary.h"
+#include "appdetails.h"
 
 /* struct for uthash */
 struct app_id{
@@ -32,6 +33,9 @@ int main(void){
 
     /* create database */
     create_hash( game_library );
+
+    char* test_app = "230820";
+    get_appdetails( test_app );
 
 }
 
