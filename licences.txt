@@ -1,0 +1,2 @@
+libcurl.dll => LICENCES/CURL
+cJSON.c, cJSON.h => LICENCES/cJSON
