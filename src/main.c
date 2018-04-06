@@ -32,9 +32,9 @@ int main(void){
     //parse_licences( steam_licences, game_library );
 
     /* create database */
-    create_hash( game_library );
+    //create_hash( game_library );
 
-    char* test_app = "230820";
+    char* test_app = "7";
     get_appdetails( test_app );
 
 }
