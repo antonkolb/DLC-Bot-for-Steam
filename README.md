@@ -5,3 +5,4 @@ Written in C.
 Used libraries:
 Curl and libcurl 7.50.3 (see "LICENCES")
 uthash 2.0.2
+cJSON 1.7.5 (see "LICENCES")
