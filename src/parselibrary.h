@@ -39,12 +39,12 @@ int parse_licences( const char* in, const char* out ){
     //open streams
     in_file = fopen( in, "r" );
     if( !in_file ){
-        perror( "Failed to open licences file to read" );
+        perror( "parselibrary:parse_licences: Failed to open licences file to read" );
         return errno;
     }
     out_file = fopen( out, "w" );
     if( !out_file ){
-        perror( "Failed to open library file to write" );
+        perror( "parselibrary:parse_licences: Failed to open library file to write" );
         return errno;
    }
 
@@ -54,7 +54,7 @@ int parse_licences( const char* in, const char* out ){
         if( !strncmp(key, tmp, strlen(key)) ){
             char* app_line;
             //it is unlikely, but at least I want to know that it happened. For comparison: The longest line had 200+ signs
-            if( tmp[strlen(tmp)-1] != '\n' ) printf( "WARNING: A line was longer then %lu! The signs after got ignored\n", line_size );
+            if( tmp[strlen(tmp)-1] != '\n' ) printf( "parselibrary:parse_licences: WARNING: A line was longer then %u! The signs after got ignored\n", line_size );
             app_line = tmp+strlen(key); // 3170, 25900, 63910, 63920, 203350, 203353, 203358,  (7 in total)
             save_apps( app_line, out_file );
         }
@@ -65,14 +65,16 @@ int parse_licences( const char* in, const char* out ){
     int close_result;
     close_result = fclose(in_file);
     if( close_result ){
-        perror("Failed to close licences file after reading");
+        perror("parselibrary:parse_licences: Failed to close licences file after reading");
         return errno;
     }
     close_result = fclose(out_file);
     if( close_result ){
-        perror("Failed to close library file after writing");
+        perror("parselibrary:parse_licences: Failed to close library file after writing");
         return errno;
     }
+
+    return 0;
 
 }
 

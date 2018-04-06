@@ -1,5 +1,9 @@
 # libs
 /lib
+  
+# Code::Blocks  
+*.depend  
+*.layout  
 
 # Other files from compilation
 *.tds

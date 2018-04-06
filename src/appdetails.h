@@ -16,6 +16,14 @@ struct cJSON* content;
 char* type;
 char* fullgame;
 
+void appdetails_cleanup(){
+
+    cJSON_Delete( content );
+    //if( remove(tmp_file) ) perror("appdetails:cleanup: Could not delete tmp json file file");
+    return;
+
+}
+
 int get_appdetails( const char* appid_str ){
 
     int res = 0;
@@ -26,16 +34,19 @@ int get_appdetails( const char* appid_str ){
     strcpy( url, prefix );
     strcat( url, appid_str );
 
+    /*get content from API and fill json struct*/
+    get_page( url, test_file );
+    read_file( test_file );
 
-    get_page( url, tmp_file );
-    read_file();
+    printf( cJSON_Print(content) );
+
 
     //cleanup & return
     free(url);
     return res;
 }
 
-int read_file(){
+int read_file( char* file2read ){
 
     FILE* file;
     //size_t total_size = 100;
@@ -44,9 +55,9 @@ int read_file(){
     char* chunk = (char*) calloc( chunk_size, sizeof(char) );
 
     /*opening*/
-    file = fopen( test_file, "r" );
+    file = fopen( file2read, "r" );
     if( !file ){
-        perror( "Could not open appdetails file to read" );
+        perror( "appdetails:read_file: Could not open appdetails file to read" );
         return errno;
     }
 
@@ -54,21 +65,20 @@ int read_file(){
 
         file_content = (char*) realloc( file_content, strlen(file_content)+strlen(chunk)+1 );
         if( file_content == NULL ){
-            perror("Couldn't realloc memory for appdteails JSON content");
+            perror("appdetails:read_file: Couldn't realloc memory for appdteails JSON content");
             break;
         }
         file_content = strcat( file_content, chunk );
     }
 
-    //content = cJSON_Parse( file_content );
+    content = cJSON_Parse( file_content );
 
     /*closing and cleanup*/
-    cJSON_Delete( content );
-    free( file_content );
     free( chunk );
+    free( file_content );
     int close_result = fclose(file);
     if( close_result ){
-        perror("Failed to close library file after writing");
+        perror("appdetails:read_file: Failed to close library file after writing");
         return errno;
     }
 

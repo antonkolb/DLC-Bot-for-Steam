@@ -34,8 +34,9 @@ int main(void){
     /* create database */
     //create_hash( game_library );
 
-    char* test_app = "7";
+    char* test_app = "471450";
     get_appdetails( test_app );
+    appdetails_cleanup();
 
 }
 

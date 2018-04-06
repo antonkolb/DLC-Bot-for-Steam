@@ -14,11 +14,11 @@ int get_page( const char* url, const char* file_name ){
     CURLcode res = CURLE_OK;
     FILE* file;
     file = fopen(file_name, "w");
-    if( !file ){ perror("Could not create file to save Steam store JSON"); return errno; }
+    if( !file ){ perror("curlwrap:getpage: Could not create file to save web content"); return errno; }
 
     /* preparing curl */
     if(!curl){
-        fprintf(stderr, "curl initialisation failure");
+        fprintf(stderr, "curlwrap:getpage: curl initialisation failure");
         return -1;
     }
 
@@ -53,7 +53,7 @@ int get_page( const char* url, const char* file_name ){
     curl_easy_cleanup(curl);
     fclose( file );
     if( (int)file == EOF ){
-            perror("Failed to close store file after download");
+            perror("curlwrap:getpage: Failed to close store file after download");
             return errno;
     }
     return 0;
