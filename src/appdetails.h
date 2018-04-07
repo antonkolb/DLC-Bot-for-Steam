@@ -11,11 +11,42 @@ int get_appdetails( const char* appid_str );
 int read_file();
 
 const char* tmp_file = "./temp/appdetails";
-const char* test_file = "./temp/dlc";
+const char* test_file = "./temp/ndlc";
 struct cJSON* content;
-char* type;
-char* fullgame;
 
+//keys
+const char* data_key = "data";
+const char* type_key = "type";
+const char* name_key = "name";
+const char* fullgame_key = "fullgame";
+const char* fullgame_id_key = "appid";
+const char* fullgame_name_key = "name";
+
+//data
+char app_type[100];
+char app_name[100];
+char parent_id[10];
+char parent_name[100];
+
+char* get_app_type(){
+    return app_type;
+}
+
+char* get_app_name(){
+    return app_name;
+}
+
+char* get_parent_id(){
+    return parent_id;
+}
+
+char* get_parent_name(){
+    return parent_name;
+}
+
+/*=============================================================================
+=== Frees allocated space for cJSON and deletes the tmp file ===
+=============================================================================*/
 void appdetails_cleanup(){
 
     cJSON_Delete( content );
@@ -24,6 +55,9 @@ void appdetails_cleanup(){
 
 }
 
+/*=============================================================================
+=== main function: gets api, fills cJSON struct and extracts relevant information ===
+=============================================================================*/
 int get_appdetails( const char* appid_str ){
 
     int res = 0;
@@ -34,11 +68,39 @@ int get_appdetails( const char* appid_str ){
     strcpy( url, prefix );
     strcat( url, appid_str );
 
-    /*get content from API and fill json struct*/
-    get_page( url, test_file );
-    read_file( test_file );
+    /*get content from API and fill JSON struct*/
+    get_page( url, tmp_file );
+    read_file( tmp_file );
 
-    printf( cJSON_Print(content) );
+
+    /* Walking the JSON tree
+
+    appid
+        data
+            type
+            name
+            fullgame
+                appid
+                name
+    */
+
+    //printf( "\n%s\n", cJSON_Print(content) );
+    cJSON* c_appid = cJSON_GetObjectItemCaseSensitive( content, appid_str );
+    cJSON* c_data = cJSON_GetObjectItemCaseSensitive( c_appid, data_key );
+
+    cJSON* c_type = cJSON_GetObjectItemCaseSensitive( c_data, type_key );
+    cJSON* c_name = cJSON_GetObjectItemCaseSensitive( c_data, name_key );
+
+    cJSON* c_fullgame = cJSON_GetObjectItemCaseSensitive( c_data, fullgame_key );
+    cJSON* c_fullgame_id = cJSON_GetObjectItemCaseSensitive( c_fullgame, fullgame_id_key );
+    cJSON* c_fullgame_name = cJSON_GetObjectItemCaseSensitive( c_fullgame, fullgame_name_key );
+
+    //extracting needed values, if available
+    if( cJSON_IsString(c_type) && (c_type->valuestring != NULL) ) strcpy( app_type, c_type->valuestring );
+    if( cJSON_IsString(c_name) && (c_name->valuestring != NULL) ) strcpy( app_name, c_name->valuestring );
+    if( cJSON_IsString(c_fullgame_id) && (c_fullgame_id->valuestring != NULL) ) strcpy( parent_id,  c_fullgame_id->valuestring );
+    if( cJSON_IsString(c_fullgame_name) && (c_fullgame_name->valuestring != NULL) ) strcpy( parent_name, c_fullgame_name->valuestring );
+    //printf( "\n%s\n", cJSON_Print(c_type) );
 
 
     //cleanup & return
@@ -46,6 +108,9 @@ int get_appdetails( const char* appid_str ){
     return res;
 }
 
+/*===================================================
+=== puts the content of a file into a JSON struct ===
+===================================================*/
 int read_file( char* file2read ){
 
     FILE* file;
@@ -87,3 +152,31 @@ int read_file( char* file2read ){
 }
 
 #endif // APPDETAILS_H
+
+/* JSON content tree
+
+appid
+    data
+        type
+        name
+        fullgame
+            appid
+            name
+{
+   "471450":{
+      "success":true,
+      "data":{
+         "type":"dlc",
+         "name":"I and Me Original Soundtrack",
+         "steam_appid":471450,
+         "required_age":0,
+         "is_free":true,
+         "detailed_description":"I and Me Original Soundtrack contains 13 tracks:<br \/>\r\n01. Main Theme<br \/>\r\n02. Bizet's Flute<br \/>\r\n03. Piano and Cello<br \/>\r\n04. Warm Strings<br \/>\r\n05. Celesta<br \/>\r\n06. Mozart's Clarinet<br \/>\r\n07. Harp in Rain<br \/>\r\n08. For Cello<br \/>\r\n09. Sound of Snow<br \/>\r\n10. Dandelion<br \/>\r\n11. Poetry of Rain<br \/>\r\n12. Wiegenlied<br \/>\r\n13. I and Me<br \/>\r\n<br \/>\r\nSoundtracks can be found in the Steam game directory:<br \/>\r\n...\\Steam\\steamapps\\common\\I and Me\\I and Me Original Soundtrack",
+         "about_the_game":"I and Me Original Soundtrack contains 13 tracks:<br \/>\r\n01. Main Theme<br \/>\r\n02. Bizet's Flute<br \/>\r\n03. Piano and Cello<br \/>\r\n04. Warm Strings<br \/>\r\n05. Celesta<br \/>\r\n06. Mozart's Clarinet<br \/>\r\n07. Harp in Rain<br \/>\r\n08. For Cello<br \/>\r\n09. Sound of Snow<br \/>\r\n10. Dandelion<br \/>\r\n11. Poetry of Rain<br \/>\r\n12. Wiegenlied<br \/>\r\n13. I and Me<br \/>\r\n<br \/>\r\nSoundtracks can be found in the Steam game directory:<br \/>\r\n...\\Steam\\steamapps\\common\\I and Me\\I and Me Original Soundtrack",
+         "short_description":"I and Me Original Soundtrack",
+         "fullgame":{
+            "appid":"399600",
+            "name":"I and Me"
+         },
+
+*/

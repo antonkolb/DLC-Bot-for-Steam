@@ -34,8 +34,12 @@ int main(void){
     /* create database */
     //create_hash( game_library );
 
-    char* test_app = "471450";
+    char* test_app = "385930";
     get_appdetails( test_app );
+    if( !strcmp(get_app_type(), "dlc") ){
+        printf( "%s (%s). Parent is %s (%s).\n", get_app_name(), test_app, get_parent_name(), get_parent_id() );
+    }
+
     appdetails_cleanup();
 
 }
