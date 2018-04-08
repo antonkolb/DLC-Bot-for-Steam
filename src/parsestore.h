@@ -30,7 +30,7 @@ int parse_store( const char* in, const char* out ){
 
     //opening
     FILE* in_file; FILE* out_file;
-    const char* key = "					\"appid\": ";
+    const char* key = "	\"appid\": ";
     in_file = fopen( in, "r" );
     if( !in_file ){
         perror("parseastore:parse_store: Failed to open store file to read");
@@ -51,6 +51,7 @@ int parse_store( const char* in, const char* out ){
         //get lines, that have an appid
         if( !strncmp(key, tmp, strlen(key)) ){
                 id = strncpy( id, tmp+strlen(key), strlen(tmp)-strlen(key)-2); //cut away the key in the beginning and the comma/ new line at the end
+                //printf( "tmp: %s\n", tmp );
                 if ( 0 > fprintf(out_file, "%s\n", id) ){
                     perror( "parseastore:parse_store: A problem occurred while writing the appids into the store file" );
                     return errno;

@@ -11,7 +11,6 @@ int get_appdetails( const char* appid_str );
 int read_file();
 
 const char* tmp_file = "./temp/appdetails";
-const char* test_file = "./temp/ndlc";
 struct cJSON* content;
 
 //keys
@@ -70,7 +69,7 @@ int get_appdetails( const char* appid_str ){
 
     /*get content from API and fill JSON struct*/
     get_page( url, tmp_file );
-    read_file( tmp_file );
+    if( read_file(tmp_file) ) return -1; //when not valid JSON
 
 
     /* Walking the JSON tree
@@ -105,6 +104,11 @@ int get_appdetails( const char* appid_str ){
 
     //cleanup & return
     free(url);
+    cJSON_Delete( content );
+    if( remove(tmp_file) ){
+        perror("appdetails:cleanup: Could not delete tmp json file file");
+        res = 1;
+    }
     return res;
 }
 
@@ -137,6 +141,10 @@ int read_file( char* file2read ){
     }
 
     content = cJSON_Parse( file_content );
+    if( content == NULL ){
+        perror( "appdetails:read_file: Not valid JSON!" );
+        return -1;
+    }
 
     /*closing and cleanup*/
     free( chunk );

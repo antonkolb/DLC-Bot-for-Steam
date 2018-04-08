@@ -16,6 +16,7 @@ struct app_id{
 
 struct app_id* my_library = NULL;                           //Hash with ids
 
+int search_new_dlcs( const char* file_with_games );
 int library_contains_app( const char* appid_str );
 int create_hash( const char* licence_file );
 int add2hash( char*const* appid );
@@ -31,16 +32,49 @@ int main(void){
     //update_store_database( steam_store );
     //parse_licences( steam_licences, game_library );
 
-    /* create database */
-    //create_hash( game_library );
+    /* create database and list unpurchased DLCs */
+    create_hash( game_library );
+    search_new_dlcs( steam_store );
 
-    char* test_app = "385930";
-    get_appdetails( test_app );
-    if( !strcmp(get_app_type(), "dlc") ){
-        printf( "%s (%s). Parent is %s (%s).\n", get_app_name(), test_app, get_parent_name(), get_parent_id() );
+    return 0;
+
+}
+
+int search_new_dlcs( const char* file_with_games ){
+
+    FILE* file;
+    file = fopen( file_with_games, "r" );
+    if( !file ){
+        perror( "main:search_new_dlcs: Could not open library file to read" );
+        return errno;
     }
 
-    appdetails_cleanup();
+    size_t size = 10;
+    char app_from_list[size];
+
+    while( fgets(app_from_list, size, file) ){
+        app_from_list[strlen(app_from_list)-1] = '\0'; //remove new line character
+        printf( "%s\n", app_from_list );
+
+        if( get_appdetails(app_from_list) ) continue; //skip null pages
+        //Is it a DLC?
+        if( !strcmp(get_app_type(), "dlc") ){
+            //Do I own the base game?
+            if( library_contains_app(get_parent_id()) ){
+                //Do I own the DLC?
+                if( !library_contains_app(app_from_list) ){
+                    printf( "%s (%s). Parent is %s (%s).\n", get_app_name(), app_from_list, get_parent_name(), get_parent_id() );
+                }
+            }
+        }
+    }//while fgets
+
+    int close_result = fclose(file);
+    if( close_result ){
+        perror("main:search_new_dlcs: Failed to close library file after reading");
+        return errno;
+    }
+    return 0;
 
 }
 
