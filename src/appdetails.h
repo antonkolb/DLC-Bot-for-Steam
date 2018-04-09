@@ -7,7 +7,7 @@
 #include "cjson/cJSON.h"
 #include "curlwrap.h"
 
-int get_appdetails( const char* appid_str );
+int get_app_details( const char* appid_str );
 int read_file();
 
 const char* tmp_file = "./temp/appdetails";
@@ -23,9 +23,9 @@ const char* fullgame_name_key = "name";
 
 //data
 char app_type[100];
-char app_name[100];
+char app_name[500];
 char parent_id[10];
-char parent_name[100];
+char parent_name[500];
 
 char* get_app_type(){
     return app_type;
@@ -44,22 +44,17 @@ char* get_parent_name(){
 }
 
 /*=============================================================================
-=== Frees allocated space for cJSON and deletes the tmp file ===
-=============================================================================*/
-void appdetails_cleanup(){
-
-    cJSON_Delete( content );
-    //if( remove(tmp_file) ) perror("appdetails:cleanup: Could not delete tmp json file file");
-    return;
-
-}
-
-/*=============================================================================
 === main function: gets api, fills cJSON struct and extracts relevant information ===
 =============================================================================*/
-int get_appdetails( const char* appid_str ){
+int get_app_details( const char* appid_str ){
 
-    int res = 0;
+    //values from previous entry not needed, so clear them
+    strcpy( app_type, "" );
+    strcpy( app_name, "" );
+    strcpy( parent_id, "" );
+    strcpy( parent_name, "" );
+
+    int status = 0;
     char* prefix = "store.steampowered.com/api/appdetails?appids=";
 
     /*building api address*/
@@ -69,7 +64,10 @@ int get_appdetails( const char* appid_str ){
 
     /*get content from API and fill JSON struct*/
     get_page( url, tmp_file );
-    if( read_file(tmp_file) ) return -1; //when not valid JSON
+    if( read_file(tmp_file) ){
+        status = -1; //when not valid JSON
+        goto end;
+    }
 
 
     /* Walking the JSON tree
@@ -103,13 +101,14 @@ int get_appdetails( const char* appid_str ){
 
 
     //cleanup & return
+end:
     free(url);
     cJSON_Delete( content );
     if( remove(tmp_file) ){
         perror("appdetails:cleanup: Could not delete tmp json file file");
-        res = 1;
+        status = 1;
     }
-    return res;
+    return status;
 }
 
 /*===================================================
@@ -117,6 +116,7 @@ int get_appdetails( const char* appid_str ){
 ===================================================*/
 int read_file( char* file2read ){
 
+    int status =  0;
     FILE* file;
     //size_t total_size = 100;
     char* file_content = (char*) calloc( 1, sizeof(char) );
@@ -142,8 +142,8 @@ int read_file( char* file2read ){
 
     content = cJSON_Parse( file_content );
     if( content == NULL ){
-        perror( "appdetails:read_file: Not valid JSON!" );
-        return -1;
+        //perror( "appdetails:read_file: Not valid JSON!" );
+        status = -1;
     }
 
     /*closing and cleanup*/
@@ -151,11 +151,11 @@ int read_file( char* file2read ){
     free( file_content );
     int close_result = fclose(file);
     if( close_result ){
-        perror("appdetails:read_file: Failed to close library file after writing");
+        perror("appdetails:read_file: Failed to close appdetails file after reading");
         return errno;
     }
 
-    return 0;
+    return status;
 
 }
 

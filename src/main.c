@@ -56,7 +56,7 @@ int search_new_dlcs( const char* file_with_games ){
         app_from_list[strlen(app_from_list)-1] = '\0'; //remove new line character
         printf( "%s\n", app_from_list );
 
-        if( get_appdetails(app_from_list) ) continue; //skip null pages
+        if( get_app_details(app_from_list) ) continue; //skip null pages
         //Is it a DLC?
         if( !strcmp(get_app_type(), "dlc") ){
             //Do I own the base game?
