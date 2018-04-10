@@ -63,7 +63,8 @@ int get_app_details( const char* appid_str ){
     strcat( url, appid_str );
 
     /*get content from API and fill JSON struct*/
-    get_page( url, tmp_file );
+    if( get_page(url, tmp_file) == EACCES ) return errno;
+
     if( read_file(tmp_file) ){
         status = -1; //when not valid JSON
         goto end;
@@ -104,10 +105,10 @@ int get_app_details( const char* appid_str ){
 end:
     free(url);
     cJSON_Delete( content );
-    if( remove(tmp_file) ){
+/*    if( remove(tmp_file) ){
         perror("appdetails:cleanup: Could not delete tmp json file file");
         status = 1;
-    }
+    }*/
     return status;
 }
 

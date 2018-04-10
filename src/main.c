@@ -52,23 +52,52 @@ int search_new_dlcs( const char* file_with_games ){
     size_t size = 10;
     char app_from_list[size];
 
+                                                                                                FILE* debug = fopen( "./data/debug", "w" );
+                                                                                                if( !debug ){
+                                                                                                    perror( "main:search_new_dlcs: Could not open debug file to write" );
+                                                                                                    return errno;
+                                                                                                }
+
+    printf( "Parsing Steam Store...\n" );
     while( fgets(app_from_list, size, file) ){
         app_from_list[strlen(app_from_list)-1] = '\0'; //remove new line character
-        printf( "%s\n", app_from_list );
+        //printf( "%s\n", app_from_list );
+
+                                                                                                if ( 0 > fprintf(debug, "%s (%s)", get_app_name(), app_from_list) ){
+                                                                                                    perror( "parseastore:parse_store: A problem occurred while writing the appids into the debug file" );
+                                                                                                    return errno;
+                                                                                                }
 
         if( get_app_details(app_from_list) ) continue; //skip null pages
+
         //Is it a DLC?
         if( !strcmp(get_app_type(), "dlc") ){
+                                                                                                if ( 0 > fprintf(debug, " is a dlc.") ){
+                                                                                                    perror( "parseastore:parse_store: A problem occurred while writing the type into the debug file" );
+                                                                                                    return errno;
+                                                                                                }
             //Do I own the base game?
             if( library_contains_app(get_parent_id()) ){
+                                                                                                if ( 0 > fprintf(debug, " Base game is %s (%s).", get_parent_name(), get_parent_id() ) ){
+                                                                                                    perror( "parseastore:parse_store: A problem occurred while writing the parent into the debug file" );
+                                                                                                    return errno;
+                                                                                                }
                 //Do I own the DLC?
                 if( !library_contains_app(app_from_list) ){
-                    printf( "%s (%s). Parent is %s (%s).\n", get_app_name(), app_from_list, get_parent_name(), get_parent_id() );
+                                                                                                if ( 0 > fprintf(debug, "I do not own it." ) ){
+                                                                                                    perror( "parseastore:parse_store: A problem occurred while writing the ownership into the debug file" );
+                                                                                                    return errno;
+                                                                                                }
+                    //printf( "%s (%s). Parent is %s (%s).\n", get_app_name(), app_from_list, get_parent_name(), get_parent_id() );
                 }
             }
         }
     }//while fgets
-
+                                                                                                if ( 0 > fprintf(debug, "\n---------------\n" ) ){
+                                                                                                    perror( "parseastore:parse_store: A problem occurred while writing the endline into the debug file" );
+                                                                                                    return errno;
+                                                                                                }
+                                                                                                fclose(debug);
     int close_result = fclose(file);
     if( close_result ){
         perror("main:search_new_dlcs: Failed to close library file after reading");
