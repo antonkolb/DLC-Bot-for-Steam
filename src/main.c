@@ -63,13 +63,11 @@ int search_new_dlcs( const char* file_with_games ){
         app_from_list[strlen(app_from_list)-1] = '\0'; //remove new line character
         //printf( "%s\n", app_from_list );
 
+        if( get_app_details(app_from_list) ) continue; //skip null pages
                                                                                                 if ( 0 > fprintf(debug, "%s (%s)", get_app_name(), app_from_list) ){
                                                                                                     perror( "parseastore:parse_store: A problem occurred while writing the appids into the debug file" );
                                                                                                     return errno;
                                                                                                 }
-
-        if( get_app_details(app_from_list) ) continue; //skip null pages
-
         //Is it a DLC?
         if( !strcmp(get_app_type(), "dlc") ){
                                                                                                 if ( 0 > fprintf(debug, " is a dlc.") ){
@@ -92,12 +90,13 @@ int search_new_dlcs( const char* file_with_games ){
                 }
             }
         }
-    }//while fgets
+
                                                                                                 if ( 0 > fprintf(debug, "\n---------------\n" ) ){
                                                                                                     perror( "parseastore:parse_store: A problem occurred while writing the endline into the debug file" );
                                                                                                     return errno;
                                                                                                 }
                                                                                                 fclose(debug);
+}//while fgets
     int close_result = fclose(file);
     if( close_result ){
         perror("main:search_new_dlcs: Failed to close library file after reading");
