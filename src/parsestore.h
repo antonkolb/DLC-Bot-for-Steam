@@ -19,7 +19,7 @@ int update_store_database( const char* store ){
     res = get_page( steam_store_url, store_tmp );
     if( res != 0 ) return res; //abort because function wasn't successful
     res = parse_store( store_tmp, store );
-    if( remove(store_tmp) ) perror("parseastore:update_store_database: Could not delete store tmp file");
+    if( remove(store_tmp) ) perror("parsestore:update_store_database: Could not delete store tmp file");
     return res;
 }
 
@@ -33,12 +33,12 @@ int parse_store( const char* in, const char* out ){
     const char* key = "	\"appid\": ";
     in_file = fopen( in, "r" );
     if( !in_file ){
-        perror("parseastore:parse_store: Failed to open store file to read");
+        perror("parsestore:parse_store: Failed to open store file to read");
         return errno;
     }
     out_file = fopen( out, "w" );
     if( !out_file ){
-            perror("parseastore:parse_store: Failed to open store file to write");
+            perror("parsestore:parse_store: Failed to open store file to write");
             return errno;
     }
 
@@ -53,7 +53,7 @@ int parse_store( const char* in, const char* out ){
                 id = strncpy( id, tmp+strlen(key), strlen(tmp)-strlen(key)-2); //cut away the key in the beginning and the comma/ new line at the end
                 //printf( "tmp: %s\n", tmp );
                 if ( 0 > fprintf(out_file, "%s\n", id) ){
-                    perror( "parseastore:parse_store: A problem occurred while writing the appids into the store file" );
+                    perror( "parsestore:parse_store: A problem occurred while writing the appids into the store file" );
                     return errno;
                 }
         }
@@ -63,12 +63,12 @@ int parse_store( const char* in, const char* out ){
     int close_result;
     close_result = fclose(in_file);
     if( close_result ){
-        perror("parseastore:parse_store: Failed to close store file after reading");
+        perror("parsestore:parse_store: Failed to close store file after reading");
         return errno;
     }
     close_result = fclose(out_file);
     if( close_result ){
-        perror("parseastore:parse_store: Failed to close store file after writing");
+        perror("parsestore:parse_store: Failed to close store file after writing");
         return errno;
     }
     free( tmp );

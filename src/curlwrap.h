@@ -29,6 +29,13 @@ int get_page( const char* url, const char* file_name ){
         return -1;
     }
 
+    //setup HTTP/2
+    res = curl_easy_setopt( curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0 );
+    if( res != CURLE_OK ){
+        fprintf( stderr, curl_easy_strerror(res) );
+        return -1;
+    }
+
     //setup Callback function
     /* the next option is making curl call a callback method for the downloaded content. The problem is, that it calls it several time depending on the size of the site (but still varying)
     In the case of the steam store API it was over 3000 times. This means most likely, that I receive the content in pieces with the danger, that the line with the ID or even the number itself
