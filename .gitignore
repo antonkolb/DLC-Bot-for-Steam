@@ -1,9 +1,15 @@
+# files
+/data
+/temp
+
 # libs
 /lib
   
 # Code::Blocks  
 *.depend  
-*.layout  
+*.layout
+*.cbp
+PKGBUILD  
 
 # Other files from compilation
 *.tds
